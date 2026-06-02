@@ -12,6 +12,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/interviews', require('./routes/interview'));
 app.use('/api/resume', require('./routes/resume'));
+app.use('/api/chat', require('./routes/chat'));
 
 app.use((err, req, res, next) => {
   console.error(err.message);

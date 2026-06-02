@@ -3,27 +3,46 @@ const { generateQuestions, evaluateAnswer, overallFeedback } = require('./gemini
 
 // POST /api/interviews/start
 exports.startInterview = async (req, res, next) => {
-  const { topic, difficulty = 'medium', count = 5 } = req.body;
-  if (!topic) return res.status(400).json({ message: 'Topic is required' });
-
-  let questions;
   try {
-    questions = await generateQuestions(topic, difficulty, count);
-  } catch (err) {
-    return res.status(502).json({ message: 'AI service error: ' + err.message });
-  }
-  const interview = await prisma.interview.create({
-    data: {
-      userId: req.user.id,
-      topic,
-      difficulty,
-      questions: {
-        create: questions.map((q) => ({ question: q })),
+    const { topic, difficulty = 'medium', count = 5, useResumeContext = false } = req.body;
+    console.log('Starting interview with:', { topic, difficulty, count, useResumeContext }); // Debug
+    
+    if (!topic) return res.status(400).json({ message: 'Topic is required' });
+
+    let questions;
+    let resumeContext = '';
+    
+    // For now, skip resume context since field doesn't exist
+    // if (useResumeContext) {
+    //   const user = await prisma.user.findUnique({
+    //     where: { id: req.user.id },
+    //     select: { resumeText: true }
+    //   });
+    //   resumeContext = user?.resumeText || '';
+    // }
+    
+    console.log('Generating questions for topic:', topic); // Debug
+    questions = await generateQuestions(topic, difficulty, count, resumeContext);
+    console.log('Generated questions:', questions); // Debug
+    
+    const interview = await prisma.interview.create({
+      data: {
+        userId: req.user.id,
+        topic,
+        difficulty,
+        questions: {
+          create: questions.map((q) => ({ question: q })),
+        },
       },
-    },
-    include: { questions: true },
-  });
-  res.status(201).json(interview);
+      include: { questions: true },
+    });
+    
+    console.log('Interview created:', interview.id); // Debug
+    res.status(201).json(interview);
+  } catch (err) {
+    console.error('Interview start error:', err); // Debug
+    res.status(500).json({ message: 'Interview start failed: ' + err.message });
+  }
 };
 
 // POST /api/interviews/:id/answer

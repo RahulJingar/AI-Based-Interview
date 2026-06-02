@@ -20,17 +20,52 @@ exports.upload = multer({
 });
 
 exports.uploadResume = async (req, res) => {
-  if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-  const resumeUrl = `/uploads/${req.file.filename}`;
-  await prisma.user.update({ where: { id: req.user.id }, data: { resumeUrl } });
-
-  const buffer = fs.readFileSync(req.file.path);
-  const pdfData = await pdfParse(buffer);
-  let analysis;
   try {
-    analysis = await analyzeResume(pdfData.text);
-  } catch (err) {
-    return res.status(502).json({ message: 'AI service error: ' + err.message });
+    if (!req.file) return res.status(400).json({ message: 'PDF file select karo' });
+    
+    const resumeUrl = `/uploads/${req.file.filename}`;
+    
+    console.log('Reading PDF file:', req.file.path);
+    const buffer = fs.readFileSync(req.file.path);
+    const pdfData = await pdfParse(buffer);
+    
+    console.log('PDF text extracted:', pdfData.text.slice(0, 100));
+    
+    // Store resume text in database for later interview use (if supported)
+    try {
+      await prisma.user.update({ 
+        where: { id: req.user.id }, 
+        data: { 
+          resumeUrl,
+          // resumeText: pdfData.text.slice(0, 5000) // TODO: Add after migration
+        }
+      });
+    } catch (dbError) {
+      console.log('Database update failed, continuing without resumeText storage');
+      await prisma.user.update({ 
+        where: { id: req.user.id }, 
+        data: { resumeUrl }
+      });
+    }
+
+    let analysis;
+    try {
+      analysis = await analyzeResume(pdfData.text);
+      console.log('AI analysis response:', analysis); // Debug
+    } catch (err) {
+      console.error('AI analysis error:', err.message);
+      return res.status(502).json({ message: 'AI service error: ' + err.message });
+    }
+    
+    // Ensure topics array exists
+    if (!analysis.topics || !Array.isArray(analysis.topics)) {
+      analysis.topics = ['JavaScript', 'React', 'Node.js', 'SQL', 'System Design']; // Fallback
+      analysis.summary = analysis.summary || 'Resume analyzed successfully. Ready for interview!';
+    }
+    
+    res.json({ resumeUrl, ...analysis });
+  } catch (error) {
+    console.error('Resume upload error:', error);
+    res.status(500).json({ message: 'Resume upload failed: ' + error.message });
   }
-  res.json({ resumeUrl, ...analysis });
 };

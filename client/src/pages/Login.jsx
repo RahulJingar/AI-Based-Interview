@@ -47,10 +47,15 @@ export default function Login() {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        <p className="text-slate-400 text-center mt-6">
-          No account?{' '}
-          <Link to="/register" className="text-violet-400 hover:underline">Register</Link>
-        </p>
+        <div className="text-center mt-6 space-y-2">
+          <Link to="/forgot-password" className="block text-violet-400 hover:underline text-sm">
+            Password bhul gaye?
+          </Link>
+          <p className="text-slate-400">
+            No account?{' '}
+            <Link to="/register" className="text-violet-400 hover:underline">Register</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

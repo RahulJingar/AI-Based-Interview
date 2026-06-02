@@ -8,13 +8,15 @@ datasource db {
 }
 
 model User {
-  id         String      @id @default(cuid())
-  name       String
-  email      String      @unique
-  password   String
-  resumeUrl  String?
-  createdAt  DateTime    @default(now())
-  interviews Interview[]
+  id              String    @id @default(cuid())
+  name            String
+  email           String    @unique
+  password        String
+  resumeUrl       String?
+  resetToken      String?
+  resetTokenExpiry DateTime?
+  createdAt       DateTime  @default(now())
+  interviews      Interview[]
 }
 
 model Interview {

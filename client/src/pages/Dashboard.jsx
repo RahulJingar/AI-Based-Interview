@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import Navbar from '../components/Navbar';
-import { Brain, TrendingUp, Clock, Plus } from 'lucide-react';
+import { Brain, TrendingUp, Clock, Plus, MessageCircle } from 'lucide-react';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -45,11 +45,49 @@ export default function Dashboard() {
         </div>
 
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Recent Interviews</h2>
+          <h2 className="text-xl font-semibold">Quick Actions</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Link to="/interview/new"
-            className="flex items-center gap-1 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg text-sm transition">
-            <Plus size={16} /> Start New
+            className="flex items-center gap-3 bg-violet-600 hover:bg-violet-700 text-white p-4 rounded-xl transition group">
+            <Plus size={20} />
+            <div>
+              <p className="font-semibold">New Interview</p>
+              <p className="text-sm opacity-90">Start mock interview</p>
+            </div>
           </Link>
+          
+          <Link to="/ai-chat"
+            className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-xl transition group">
+            <MessageCircle size={20} />
+            <div>
+              <p className="font-semibold">AI Chat</p>
+              <p className="text-sm opacity-90">Ask coding questions</p>
+            </div>
+          </Link>
+          
+          <Link to="/history"
+            className="flex items-center gap-3 bg-amber-600 hover:bg-amber-700 text-white p-4 rounded-xl transition group">
+            <Clock size={20} />
+            <div>
+              <p className="font-semibold">History</p>
+              <p className="text-sm opacity-90">View past interviews</p>
+            </div>
+          </Link>
+          
+          <Link to="/resume"
+            className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl transition group">
+            <Brain size={20} />
+            <div>
+              <p className="font-semibold">Resume</p>
+              <p className="text-sm opacity-90">Upload & analyze</p>
+            </div>
+          </Link>
+        </div>
+
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Recent Interviews</h2>
         </div>
 
         {recent.length === 0 ? (

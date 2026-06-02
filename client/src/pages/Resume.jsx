@@ -1,13 +1,16 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import Navbar from '../components/Navbar';
 import toast from 'react-hot-toast';
-import { Upload, FileText, Sparkles } from 'lucide-react';
+import { Upload, FileText, Sparkles, Play } from 'lucide-react';
 
 export default function Resume() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [startingInterview, setStartingInterview] = useState(false);
+  const navigate = useNavigate();
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -19,12 +22,42 @@ export default function Resume() {
       const { data } = await api.post('/resume/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+      console.log('Resume analysis result:', data); // Debug
       setResult(data);
       toast.success('Resume analyzed!');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Upload failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const startResumeInterview = async () => {
+    console.log('Result object:', result); // Debug
+    console.log('Topics array:', result?.topics); // Debug
+    
+    if (!result) {
+      return toast.error('Pehle resume upload aur analyze karo');
+    }
+    
+    if (!result.topics || !Array.isArray(result.topics) || result.topics.length === 0) {
+      return toast.error('Resume mein topics nahi mile. Dusra resume try karo');
+    }
+    
+    setStartingInterview(true);
+    try {
+      // Pick random topic from resume analysis
+      const randomTopic = result.topics[Math.floor(Math.random() * result.topics.length)];
+      const { data } = await api.post('/interviews/start', {
+        topic: randomTopic,
+        difficulty: 'medium',
+        count: 5,
+        useResumeContext: true
+      });
+      navigate(`/interview/${data.id}`);
+    } catch (err) {
+      toast.error('Interview start nahi ho raha, try again');
+      setStartingInterview(false);
     }
   };
 
@@ -64,13 +97,21 @@ export default function Resume() {
             </div>
             <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
               <p className="text-violet-400 font-semibold text-sm mb-4">Recommended Interview Topics</p>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 mb-4">
                 {result.topics?.map((t) => (
                   <span key={t} className="px-4 py-2 bg-violet-600/20 border border-violet-500/30 text-violet-300 rounded-full text-sm">
                     {t}
                   </span>
                 ))}
               </div>
+              <button
+                onClick={startResumeInterview}
+                disabled={startingInterview}
+                className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50"
+              >
+                <Play size={16} />
+                {startingInterview ? 'Starting Interview...' : 'Start Resume-Based Interview'}
+              </button>
             </div>
           </div>
         )}

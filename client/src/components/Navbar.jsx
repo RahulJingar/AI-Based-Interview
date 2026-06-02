@@ -1,6 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, Brain, History, Upload, Plus } from 'lucide-react';
+import { LogOut, Brain, History, Upload, Plus, MessageCircle } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -19,6 +19,9 @@ export default function Navbar() {
       <div className="flex items-center gap-4">
         <Link to="/interview/new" className="flex items-center gap-1 text-slate-300 hover:text-violet-400 transition text-sm">
           <Plus size={16} /> New Interview
+        </Link>
+        <Link to="/ai-chat" className="flex items-center gap-1 text-slate-300 hover:text-emerald-400 transition text-sm">
+          <MessageCircle size={16} /> AI Chat
         </Link>
         <Link to="/history" className="flex items-center gap-1 text-slate-300 hover:text-violet-400 transition text-sm">
           <History size={16} /> History

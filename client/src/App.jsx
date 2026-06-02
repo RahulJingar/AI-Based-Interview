@@ -4,12 +4,15 @@ import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import NewInterview from './pages/NewInterview';
 import InterviewSession from './pages/InterviewSession';
 import InterviewResult from './pages/InterviewResult';
 import History from './pages/History';
 import Resume from './pages/Resume';
+import AIChat from './pages/AIChat';
 
 export default function App() {
   return (
@@ -24,6 +27,8 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/interview/new" element={<PrivateRoute><NewInterview /></PrivateRoute>} />
@@ -31,6 +36,7 @@ export default function App() {
           <Route path="/interview/:id/result" element={<PrivateRoute><InterviewResult /></PrivateRoute>} />
           <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
           <Route path="/resume" element={<PrivateRoute><Resume /></PrivateRoute>} />
+          <Route path="/ai-chat" element={<PrivateRoute><AIChat /></PrivateRoute>} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
