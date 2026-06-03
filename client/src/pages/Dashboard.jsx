@@ -21,7 +21,7 @@ export default function Dashboard() {
   }, []);
 
   const quickActions = [
-    { to: '/interview/new', icon: Plus, label: 'New Interview', desc: 'Start mock interview', color: 'from-violet-600 to-violet-700', shadow: 'shadow-violet-500/20' },
+    { to: '/interview/new', icon: Plus, label: 'New Interview old wala bhi dikhao', desc: 'Start mock interview', color: 'from-violet-600 to-violet-700', shadow: 'shadow-violet-500/20' },
     { to: '/ai-chat', icon: MessageCircle, label: 'AI Chat', desc: 'Ask anything', color: 'from-emerald-600 to-emerald-700', shadow: 'shadow-emerald-500/20' },
     { to: '/history', icon: Clock, label: 'History', desc: 'Past interviews', color: 'from-amber-600 to-amber-700', shadow: 'shadow-amber-500/20' },
     { to: '/resume', icon: Upload, label: 'Resume', desc: 'Upload & analyze', color: 'from-blue-600 to-blue-700', shadow: 'shadow-blue-500/20' },
