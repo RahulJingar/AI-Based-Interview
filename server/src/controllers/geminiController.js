@@ -226,36 +226,49 @@ Return JSON:
   return JSON.parse(await callGroqText(prompt));
 };
 
-exports.chatWithAI = async (question) => {
+exports.chatWithAI = async (question, conversationHistory = []) => {
   if (USE_MOCK) {
-    return `Yeh ek mock response hai bhai! Tumne pucha: "${question}". Real AI key set karo taaki proper answer mil sake. Abhi toh main sirf demo mode mein hun! 😄`;
+    return `Yeh bilkul simple hai bhai!\n\nJab tum koi kaam karte ho step by step, woh ek process hoti hai.\n\n\`\`\`mermaid\nflowchart TD\n    A[Start] --> B[Samjho Question]\n    B --> C[Answer Socho]\n    C --> D[Submit Karo]\n    D --> E[Done!]\`\`\`\n\nYaad raho: Practice se sab aata hai! 💪`;
   }
 
-  const prompt = `You are a friendly coding mentor who explains things in simple Hinglish (Hindi + English mix).
-User asked: "${question}"
-
-Explain in a conversational, friendly tone like you're talking to a friend.
-Use simple words, avoid heavy technical jargon.
-Give practical examples when possible.
-Be encouraging and helpful.
-Mix Hindi and English naturally like Indian developers talk.
-
-Examples of your tone:
-- "Arre yaar, yeh bahut simple hai!"
-- "Dekho bhai, React mein..."
-- "Samjha kya? Agar nahi toh aur detail mein bata dunga!"
-
-Respond directly, no JSON format needed.`;
-
   try {
+    const messages = [
+      {
+        role: 'system',
+        content: `You are a friendly coding mentor. Rules:
+1. NEVER repeat or restate the question back
+2. Start your answer directly with the explanation
+3. Explain in simple Hinglish (Hindi + English mix) like talking to a friend
+4. Use simple words, avoid heavy jargon
+5. Always include a Mermaid diagram when it helps visualize the concept
+6. For processes/flows use: \`\`\`mermaid\nflowchart TD\n...\`\`\`
+7. For sequences use: \`\`\`mermaid\nsequenceDiagram\n...\`\`\`
+8. Keep diagrams simple with short labels
+9. Remember full conversation context
+10. Tone: "Dekho bhai...", "Simple hai!", "Samjha?"
+
+Diagram example for event loop:
+\`\`\`mermaid
+flowchart TD
+    A[Call Stack] --> B{Empty?}
+    B -- No --> C[Execute Code]
+    B -- Yes --> D[Check Event Queue]
+    D --> A
+\`\`\``
+      },
+      ...conversationHistory,
+      { role: 'user', content: question }
+    ];
+
     const completion = await groq.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
+      messages,
       model: 'llama-3.3-70b-versatile',
       temperature: 0.7,
+      max_tokens: 1500,
     });
     return completion.choices[0]?.message?.content?.trim() || 'Kuch samajh nahi aaya bhai, dobara pucho!';
   } catch (error) {
     console.error('Chat AI error:', error);
-    return 'Sorry bhai, AI se baat nahi ho pa rahi. Thoda simple words mein pucho ya baad mein try karo! 😅';
+    return 'Sorry bhai, AI se baat nahi ho pa rahi. Thoda baad try karo!';
   }
 };
